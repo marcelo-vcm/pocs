@@ -1,3 +1,4 @@
+target/
 *.class
 *.log
 
@@ -7,3 +8,5 @@ hs_err_pid*
 .bsp
 
 kdtree_steps
+
+.DS_Store
