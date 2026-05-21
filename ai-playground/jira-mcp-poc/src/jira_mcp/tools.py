@@ -20,11 +20,12 @@ def _issue_text(issue: dict) -> str:
 
 
 def _fetch(jql: str) -> list[dict]:
+    params = {"jql": jql, "maxResults": 50, "fields": "summary,description,status,issuetype"}
     with get_client() as client:
-        r = client.get("/search", params={"jql": jql, "maxResults": 50})
+        r = client.get("/search/jql", params=params)
         if r.status_code == 401:
             with get_client_fresh() as fresh:
-                r = fresh.get("/search", params={"jql": jql, "maxResults": 50})
+                r = fresh.get("/search/jql", params=params)
         r.raise_for_status()
         return r.json().get("issues", [])
 

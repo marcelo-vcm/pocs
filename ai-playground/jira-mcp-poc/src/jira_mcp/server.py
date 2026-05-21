@@ -1,5 +1,5 @@
 from mcp.server.fastmcp import FastMCP
-from . import tools
+from jira_mcp import tools
 
 mcp = FastMCP("jira-mcp")
 
