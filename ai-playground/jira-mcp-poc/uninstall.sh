@@ -1,36 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  echo "Usage: $0 --project <path>"
-  exit 1
-}
-
-PROJECT_DIR=""
+PROJECT_DIR="${PWD}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --project) PROJECT_DIR="$2"; shift 2 ;;
-    *) usage ;;
+    --project) PROJECT_DIR="$(cd "$2" && pwd)"; shift 2 ;;
+    *) echo "Unknown option: $1"; echo "Usage: $0 [--project <path>]"; exit 1 ;;
   esac
 done
 
-[[ -n "$PROJECT_DIR" ]] || { echo "Error: --project <path> is required"; usage; }
+command -v claude >/dev/null || { echo "claude CLI not found."; exit 1; }
 
-CONFIG_FILE="$(cd "$PROJECT_DIR" && pwd)/.claude/settings.json"
-
-python3 - <<EOF
-import json, os
-
-p = "$CONFIG_FILE"
-if not os.path.exists(p):
-    print("Config not found: " + p)
-    raise SystemExit(0)
-
-cfg = json.loads(open(p).read())
-if "jira-mcp" in cfg.get("mcpServers", {}):
-    del cfg["mcpServers"]["jira-mcp"]
-    open(p, "w").write(json.dumps(cfg, indent=2))
-    print("Removed jira-mcp from " + p)
-else:
-    print("jira-mcp not found in " + p)
-EOF
+cd "$PROJECT_DIR"
+claude mcp remove jira-mcp --scope local 2>/dev/null && echo "Removed jira-mcp from $PROJECT_DIR" \
+  || echo "jira-mcp was not registered in $PROJECT_DIR"

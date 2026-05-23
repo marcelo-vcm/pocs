@@ -19,7 +19,7 @@ def get_collection() -> chromadb.Collection:
 def upsert(issues: list[dict], embeddings: list[list[float]]) -> None:
     col = get_collection()
     col.upsert(
-        ids=[i["key"] for i in issues],
+        ids=[i["id"] for i in issues],
         embeddings=embeddings,
         documents=[i["text"] for i in issues],
         metadatas=[{k: v for k, v in i.items() if k != "text"} for i in issues],
